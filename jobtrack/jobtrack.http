@@ -1,0 +1,21 @@
+
+### Test: Get all jobs
+GET http://localhost:8080/api/jobs
+
+
+### Update /netflix job status
+PUT http://localhost:8080/api/jobs/1
+content-Type: application/json
+
+{
+  "company": "Netflix",
+  "role": "Java Developer",
+  "status": "Interview",
+  "appliedDate":"2026-10-28"
+
+}
+
+
+### Delete a job application
+DELETE http://localhost:8080/api/jobs/2
+
