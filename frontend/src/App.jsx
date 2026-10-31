@@ -13,6 +13,7 @@ function App() {
   const [description,setDescription] = useState("");
   const [notes, setNotes] = useState("");
   const [jobUrl, setJobUrl] = useState("");
+  const [editingJob, setEditingJob] = useState(null);
   const [selectedJob,setSelectedJob] = useState(null);
 
   useEffect(() => {
@@ -56,7 +57,53 @@ function App() {
   return matchesSearch && matchesStatus;
 });
 
-    
+ 
+async function saveEditedJob(event) {
+  event.preventDefault();
+
+  if (!editingJob) return;
+
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/jobs/${editingJob.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company: editingJob.company,
+          role: editingJob.role,
+          status: editingJob.status,
+          appliedDate: editingJob.appliedDate,
+          description: editingJob.description,
+          notes: editingJob.notes,
+          jobUrl: editingJob.jobUrl,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update job");
+    }
+
+    const updatedJob = await response.json();
+
+    setJobs((previousJobs) =>
+      previousJobs.map((job) =>
+        job.id === updatedJob.id ? updatedJob : job
+      )
+    );
+
+    setEditingJob(null);
+    setError("");
+
+  } catch (error) {
+    console.error("Updating job failed:", error);
+    setError("Could not update job. Please try again.");
+  }
+}
+   
 
 async function addJob(event) {
   event.preventDefault();
@@ -300,9 +347,14 @@ async function deleteJob(id) {
         <span className="role">{job.role}</span>
         <button
          className="view-button"
-         onClick={() => setSelectedJob(job)}
+         onClick={() => {
+          setEditingJob({ ...job});
+          setSelectedJob(null);
+         }}
          >
+          Edit Job
           View Details
+
          </button>
       </td>
 
@@ -391,6 +443,102 @@ async function deleteJob(id) {
     </div>
   </div>
 )}
+        
+{editingJob && (
+  <div className="details-overlay">
+    <form className="details-panel" onSubmit={saveEditedJob}>
+      <button
+        type="button"
+        className="close-button"
+        onClick={() => setEditingJob(null)}
+      >
+        ✕
+      </button>
+
+      <h2>Edit Job Application</h2>
+
+      <label>Company Name</label>
+      <input
+        value={editingJob.company}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            company: event.target.value,
+          })
+        }
+        required
+      />
+
+      <label>Job Title</label>
+      <input
+        value={editingJob.role}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            role: event.target.value,
+          })
+        }
+        required
+      />
+
+      <label>Status</label>
+      <select
+        value={editingJob.status}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            status: event.target.value,
+          })
+        }
+      >
+        <option>Applied</option>
+        <option>Interview</option>
+        <option>Offer</option>
+        <option>Rejected</option>
+      </select>
+
+      <label>Job Description</label>
+      <textarea
+        rows="5"
+        value={editingJob.description || ""}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            description: event.target.value,
+          })
+        }
+      />
+
+      <label>Personal Notes</label>
+      <textarea
+        rows="3"
+        value={editingJob.notes || ""}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            notes: event.target.value,
+          })
+        }
+      />
+
+      <label>Job Posting URL</label>
+      <input
+        type="url"
+        value={editingJob.jobUrl || ""}
+        onChange={(event) =>
+          setEditingJob({
+            ...editingJob,
+            jobUrl: event.target.value,
+          })
+        }
+      />
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+)}
+
+
 
       </main>
     </div>
