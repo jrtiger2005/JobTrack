@@ -1,6 +1,7 @@
 
 import {useEffect ,useState } from "react";
 import "./App.css";
+import InterviewCalendar from "./InterviewCalendar.jsx";
 
 function App() {
   const [jobs, setJobs] = useState([]);
@@ -42,9 +43,19 @@ function App() {
     applied: jobs.filter((job) => job.status === "Applied").length,
     interviews: jobs.filter((job) => job.status === "Interview").length,
     offers: jobs.filter((job) => job.status === "Offer").length,
+    completed: jobs.filter((job) => job.interviewCompleted === true).length,
   };
 
-  const filteredJobs = jobs.filter((job) => {
+  const interviewSuccessRate =
+  counts.interviews + counts.completed === 0
+    ? 0
+    : Math.round(
+        (counts.completed /
+          (counts.interviews + counts.completed)) *
+          100
+      );
+  
+const filteredJobs = jobs.filter((job) => {
   const query = search.toLowerCase().trim();
 
   const matchesSearch =
@@ -57,7 +68,80 @@ function App() {
   return matchesSearch && matchesStatus;
 });
 
- 
+const upcomingInterviews = jobs
+
+  .filter((job) => {
+    return (
+      job.interviewDate &&
+      job.interviewDate >= new Date().toISOString().slice(0, 10) &&
+      job.status !== "Rejected"
+    );
+  })
+  .sort((a, b) =>
+    a.interviewDate.localeCompare(b.interviewDate)
+  );
+    const completedInterviews = jobs.filter(
+      (job) => job.interviewCompleted === true
+    );
+
+  const getDaysUntilInterview = (interviewDate) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const interview = new Date(`${interviewDate}T00:00:00`);
+
+  const difference = interview - today;
+
+  return Math.ceil(difference / (1000 * 60 * 60 * 24));
+};
+
+
+async function completeInterview(job) {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/jobs/${job.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company: job.company,
+          role: job.role,
+          status: job.status,
+          appliedDate: job.appliedDate,
+          description: job.description,
+          notes: job.notes,
+          jobUrl: job.jobUrl,
+          interviewDate: job.interviewDate,
+          interviewTime: job.interviewTime,
+          interviewRound: job.interviewRound,
+          interviewCompleted: true,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to complete interview");
+    }
+
+    const updatedJob = await response.json();
+
+    console.log("Updated interview:", updatedJob);
+
+    setJobs((previousJobs) =>
+      previousJobs.map((item) =>
+        item.id === updatedJob.id ? updatedJob : item
+      )
+    );
+
+  } catch (error) {
+    console.error("Interview completion failed:", error);
+    setError("Could not update interview status.");
+  }
+}
+
+
 async function saveEditedJob(event) {
   event.preventDefault();
 
@@ -79,6 +163,10 @@ async function saveEditedJob(event) {
           description: editingJob.description,
           notes: editingJob.notes,
           jobUrl: editingJob.jobUrl,
+          interviewDate: editingJob.interviewDate,
+          interviewTime: editingJob.interviewTime,
+          interviewRound: editingJob.interviewRound,
+          interviewCompleted: editingJob.interviewCompleted,
         }),
       }
     );
@@ -112,6 +200,11 @@ async function addJob(event) {
 
   try {
     console.log("Description being sent:", description);
+    console.log("Interview details:", {
+       date: editingJob.interviewDate,
+       time: editingJob.interviewTime,
+       round: editingJob.interviewRound,
+      });
 
     const response = await fetch("http://localhost:8080/api/jobs", {
       method: "POST",
@@ -231,7 +324,26 @@ async function deleteJob(id) {
           <Stat title="Applied" value={counts.applied} />
           <Stat title="Interviews" value={counts.interviews} />
           <Stat title="Offers" value={counts.offers} />
+          <Stat title="Completed Interviews" value={counts.completed} />
         </section>
+
+        <section className="panel">
+          <h2>Interview Completion Rate</h2>
+
+          <h1>{interviewSuccessRate}%</h1>
+
+          <div className="progress-bar">
+          <div
+          className="progress-fill"
+          style={{ width: `${interviewSuccessRate}%` }}
+          ></div>
+          </div>
+
+         <p className="muted">
+         {counts.completed} of {counts.interviews + counts.completed} interviews completed
+        </p>
+        </section>
+        <InterviewCalendar jobs={jobs} />
 
         <section className="panel">
           <div className="section-heading">
@@ -425,6 +537,22 @@ async function deleteJob(id) {
       <p>
         <strong>Applied Date:</strong> {selectedJob.appliedDate}
       </p>
+         <h3>Interview Details</h3>
+
+      <p>
+         <strong>Interview Date:</strong>{" "}
+           {selectedJob.interviewDate || "Not scheduled"}
+      </p>
+
+       <p>
+          <strong>Interview Time:</strong>{" "}
+          {selectedJob.interviewTime || "Not scheduled"}
+        </p>
+
+       <p>
+          <strong>Interview Round:</strong>{" "}
+          {selectedJob.interviewRound || "Not selected"}
+        </p>   
 
       <h3>Job Description</h3>
       <p>{selectedJob.description || "No description added."}</p>
@@ -452,8 +580,95 @@ async function deleteJob(id) {
         className="close-button"
         onClick={() => setEditingJob(null)}
       >
-        ✕
+      x
+       
       </button>
+      
+      
+      <section className="upcoming-interviews">
+      <h2>Upcoming Interviews</h2>
+
+      {upcomingInterviews.length === 0 ? (
+      <p>No upcoming interviews scheduled.</p>
+      ) : (
+       <div className="interview-list">
+          {upcomingInterviews.map((job) => (
+
+  
+          <div className="interview-card" key={job.id}>
+           <h3>{job.company}</h3>
+           <p>{job.role}</p>
+
+            <p>
+              <strong>Date:</strong> {job.interviewDate}
+            </p>
+
+            <p className="interview-countdown">
+              {getDaysUntilInterview(job.interviewDate) === 0
+              ? "Interview today!"
+               : getDaysUntilInterview(job.interviewDate) === 1
+               ? "1 day left"
+              : `${getDaysUntilInterview(job.interviewDate)} days left`}
+           </p>
+            <button
+             className="view-button"
+             onClick={() => {
+              setSelectedJob(job);
+              }}
+              >
+             View Details
+            </button>
+            
+            
+{!job.interviewCompleted && (
+  <button
+    className="view-button"
+    onClick={() => completeInterview(job)}
+  >
+    Mark as Completed
+  </button>
+)}
+
+
+            <p>
+              <strong>Time:</strong>{" "}
+              {job.interviewTime || "Not specified"}
+              </p>
+
+              <p>
+              <strong>Round:</strong>{" "}
+              {job.interviewRound || "Not specified"}
+              </p>
+            </div>
+          ))}
+       </div>
+     )}
+     </section>
+<section className="upcoming-interviews">
+  <h2>Completed Interviews</h2>
+
+  {completedInterviews.length === 0 ? (
+    <p>No completed interviews yet.</p>
+  ) : (
+    <div className="interview-list">
+      {completedInterviews.map((job) => (
+        <div className="interview-card" key={job.id}>
+          <h3>{job.company}</h3>
+          <p>{job.role}</p>
+          <p>
+            <strong>Date:</strong> {job.interviewDate || "Not specified"}
+          </p>
+          <p>
+            <strong>Round:</strong> {job.interviewRound || "Not specified"}
+          </p>
+          <p className="interview-countdown">
+            Interview Completed ✓
+          </p>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
       <h2>Edit Job Application</h2>
 
@@ -522,6 +737,48 @@ async function deleteJob(id) {
       />
 
       <label>Job Posting URL</label>
+      
+      <label>Interview Date</label>
+    <input
+     type="date"
+     value={editingJob.interviewDate || ""}
+     onChange={(event) =>
+       setEditingJob({
+        ...editingJob,
+        interviewDate: event.target.value,
+       })
+     }
+    />
+
+      <label>Interview Time</label>
+    <input
+     type="time"
+     value={editingJob.interviewTime || ""}
+     onChange={(event) =>
+       setEditingJob({
+        ...editingJob,
+        interviewTime: event.target.value,
+      })
+     }
+    />
+
+      <label>Interview Round</label>
+    <select
+     value={editingJob.interviewRound || ""}
+     onChange={(event) =>
+     setEditingJob({
+       ...editingJob,
+       interviewRound: event.target.value,
+      })
+     }
+     >
+     <option value="">Select interview round</option>
+     <option value="Technical">Technical</option>
+     <option value="HR">HR</option>
+     <option value="Managerial">Managerial</option>
+     <option value="Assignment">Assignment</option>
+     </select>
+
       <input
         type="url"
         value={editingJob.jobUrl || ""}

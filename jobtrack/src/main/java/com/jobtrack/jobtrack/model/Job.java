@@ -22,6 +22,11 @@ public class Job {
     private String description;
     private String notes;
     private String jobUrl;
+    private LocalDate interviewDate;
+    private String interviewTime;
+    private String interviewRound;
+    private boolean interviewCompleted = false;
+
 
     public Job() {
     }
@@ -98,5 +103,39 @@ public class Job {
 
     public void setJobUrl(String jobUrl){
         this.jobUrl = jobUrl;
+    }
+
+    public LocalDate getInterviewDate(){
+        return interviewDate;
+    }
+
+    public void setInterviewDate(LocalDate interviewDate){
+        this.interviewDate = interviewDate;   
+    }
+
+    public String getInterviewTime(){
+        return interviewTime;        
+    }
+
+    public void setInterviewTime(String interviewTime) {
+    this.interviewTime = interviewTime;
+    }
+
+    public String getInterviewRound() {
+    return interviewRound;
+
+    }
+
+    public void setInterviewRound(String interviewRound) {
+    this.interviewRound = interviewRound;
+    
+    }
+
+    public boolean isInterviewCompleted() {
+        return interviewCompleted;
+    }
+
+    public  void setInterviewCompleted(boolean interviewCompleted) {
+        this.interviewCompleted = interviewCompleted;
     }
 }

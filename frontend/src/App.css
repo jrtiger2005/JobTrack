@@ -411,4 +411,151 @@ footer {
 .details-panel a {
   color: #9eafff;
 }
+.upcoming-interviews {
+  margin: 25px 0;
+  padding: 22px;
+  background: #151e30;
+  border: 1px solid #34415a;
+  border-radius: 12px;
+}
 
+.upcoming-interviews h2 {
+  color: white;
+  margin-bottom: 18px;
+}
+
+.interview-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.interview-card {
+  padding: 18px;
+  background: #0d1424;
+  border: 1px solid #34415a;
+  border-radius: 10px;
+}
+
+.interview-card h3 {
+  color: #9eafff;
+  margin-bottom: 8px;
+}
+
+.interview-card p {
+  color: #cbd5e1;
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+
+.interview-countdown {
+  color: #9eafff !important;
+  font-weight: 700;
+  margin-top: 12px !important;
+}
+
+.progress-bar{
+  width: 100%;
+  height: 12px;
+  background-color: #0a0b0b;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-fill{
+  height: 100%;
+  background: #16a34a;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+/* Interview Calendar */
+
+.interview-calendar {
+  margin-top: 25px;
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.calendar-header div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.calendar-header button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #eb7125;
+  color: white;
+  cursor: pointer;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.calendar-day-name {
+  text-align: center;
+  font-weight: bold;
+  padding: 12px 2px;
+  color: #94a3b8;
+}
+
+.calendar-cell {
+  min-width: 0;
+  min-height: 100px;
+  padding: 8px;
+  background: #0d1424;
+  border: 1px solid #34415a;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.calendar-cell.empty {
+  background: transparent;
+  border: none;
+}
+
+.calendar-event {
+  margin-top: 8px;
+  padding: 5px;
+  background: #eb7b25;
+  color: white;
+  font-size: 12px;
+  border-radius: 5px;
+}
+
+.calendar-event small {
+  display: block;
+  margin-top: 3px;
+}
+
+@media (max-width: 600px) {
+  .calendar-grid {
+    gap: 3px;
+  }
+
+  .calendar-cell {
+    min-height: 70px;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .calendar-event {
+    font-size: 9px;
+    padding: 3px;
+  }
+}

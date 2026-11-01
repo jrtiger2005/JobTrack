@@ -53,6 +53,10 @@ public Job updateJob(
     existingJob.setDescription(updatedJob.getDescription());
     existingJob.setNotes(updatedJob.getNotes());
     existingJob.setJobUrl(updatedJob.getJobUrl());
+    existingJob.setInterviewDate(updatedJob.getInterviewDate());
+    existingJob.setInterviewTime(updatedJob.getInterviewTime());
+    existingJob.setInterviewRound(updatedJob.getInterviewRound());
+    existingJob.setInterviewCompleted(updatedJob.isInterviewCompleted());
 
     return jobRepository.save(existingJob);
 }
