@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function InterviewCalendar({ jobs }) {
+function InterviewCalendar({ jobs, onEdit, onDelete }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -97,18 +97,36 @@ function InterviewCalendar({ jobs }) {
                <p>No interviews scheduled for this date.</p>
               ) : (
                selectedInterviews.map((job) => (
-                <div className="interview-card" key={job.id}>
-                <h3>{job.company}</h3>
-                <p>{job.role}</p>
-                <p>
-                   <strong>Time:</strong>{" "}
-                   {job.interviewTime || "Not specified"}
-                </p>
-              <p>
-                 <strong>Round:</strong>{" "}
-                 {job.interviewRound || "Not specified"}
-              </p>
-            </div>
+            <div className="interview-card" key={job.id}>
+              <h3>{job.company}</h3>
+               <p>{job.role}</p>
+
+               <p>
+                 <strong>Time:</strong>{" "}
+                {job.interviewTime || "Not specified"}
+                 </p>
+
+                    <p>
+                        <strong>Round:</strong>{" "}
+                    {job.interviewRound || "Not specified"}
+                   </p>
+
+                <div className="calendar-actions">
+          <button
+             className="view-button"
+             onClick={() => onEdit(job)}
+             >
+             Edit Interview
+          </button>
+
+          <button
+            className="delete-button"
+            onClick={() => onDelete(job.id)}
+          >
+           Delete Interview
+          </button>
+       </div>
+      </div>
            ))
         )}
      </div>

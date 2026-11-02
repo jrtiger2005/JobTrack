@@ -200,11 +200,7 @@ async function addJob(event) {
 
   try {
     console.log("Description being sent:", description);
-    console.log("Interview details:", {
-       date: editingJob.interviewDate,
-       time: editingJob.interviewTime,
-       round: editingJob.interviewRound,
-      });
+    
 
     const response = await fetch("http://localhost:8080/api/jobs", {
       method: "POST",
@@ -343,7 +339,11 @@ async function deleteJob(id) {
          {counts.completed} of {counts.interviews + counts.completed} interviews completed
         </p>
         </section>
-        <InterviewCalendar jobs={jobs} />
+        <InterviewCalendar
+         jobs={jobs}
+         onEdit={setEditingJob}
+         onDelete={deleteJob}
+       />
 
         <section className="panel">
           <div className="section-heading">
@@ -353,45 +353,76 @@ async function deleteJob(id) {
             </div>
           </div>
 
-           
-<form className="job-form" onSubmit={addJob}>
-  <input
-    placeholder="Company name"
-    value={company}
-    onChange={(event) => setCompany(event.target.value)}
-    required
-  />
+ <form className="job-form add-job-form" onSubmit={addJob}>
 
-  <input
-    placeholder="Job title"
-    value={role}
-    onChange={(event) => setRole(event.target.value)}
-    required
-  />
+  <div className="edit-section">
+    <h3>Basic Information</h3>
 
-  <textarea
-    placeholder="Job description"
-    value={description}
-    onChange={(event) => setDescription(event.target.value)}
-    rows="3"
-  />
+    <div className="edit-grid">
+      <div className="edit-field">
+        <label>Company Name</label>
+        <input
+          placeholder="e.g. Google"
+          value={company}
+          onChange={(event) => setCompany(event.target.value)}
+          required
+        />
+      </div>
 
-  <textarea
-    placeholder="Personal notes"
-    value={notes}
-    onChange={(event) => setNotes(event.target.value)}
-    rows="3"
-  />
+      <div className="edit-field">
+        <label>Job Title</label>
+        <input
+          placeholder="e.g. Java Developer"
+          value={role}
+          onChange={(event) => setRole(event.target.value)}
+          required
+        />
+      </div>
+    </div>
+  </div>
 
-  <input
-    type="url"
-    placeholder="Job posting URL (https://...)"
-    value={jobUrl}
-    onChange={(event) => setJobUrl(event.target.value)}
-  />
+  <div className="edit-section">
+    <h3>Application Details</h3>
 
-  <button type="submit">+ Add job</button>
-</form>
+    <div className="edit-field">
+      <label>Job Description</label>
+      <textarea
+        placeholder="Describe the job responsibilities..."
+        value={description}
+        onChange={(event) => setDescription(event.target.value)}
+        rows="4"
+      />
+    </div>
+
+    <div className="edit-field">
+      <label>Personal Notes</label>
+      <textarea
+        placeholder="Add your thoughts and reminders..."
+        value={notes}
+        onChange={(event) => setNotes(event.target.value)}
+        rows="3"
+      />
+    </div>
+
+    <div className="edit-field">
+      <label>Job Posting URL</label>
+      <input
+        type="url"
+        placeholder="https://careers.company.com"
+        value={jobUrl}
+        onChange={(event) => setJobUrl(event.target.value)}
+      />
+    </div>
+  </div>
+
+  <div className="add-job-actions">
+    <button type="submit" className="save-edit">
+      + Add Job Application
+    </button>
+  </div>
+
+</form>          
+
 
         </section>
 
@@ -541,12 +572,12 @@ async function deleteJob(id) {
 
       <p>
          <strong>Interview Date:</strong>{" "}
-           {selectedJob.interviewDate || "Not scheduled"}
+           {selectedJob.interviewDate || " "}
       </p>
 
        <p>
           <strong>Interview Time:</strong>{" "}
-          {selectedJob.interviewTime || "Not scheduled"}
+          {selectedJob.interviewTime || " "}
         </p>
 
        <p>
@@ -574,223 +605,192 @@ async function deleteJob(id) {
         
 {editingJob && (
   <div className="details-overlay">
-    <form className="details-panel" onSubmit={saveEditedJob}>
+    <form
+      className="details-panel edit-modal"
+      onSubmit={saveEditedJob}
+    >
       <button
         type="button"
         className="close-button"
         onClick={() => setEditingJob(null)}
       >
-      x
-       
+        ×
       </button>
-      
-      
-      <section className="upcoming-interviews">
-      <h2>Upcoming Interviews</h2>
 
-      {upcomingInterviews.length === 0 ? (
-      <p>No upcoming interviews scheduled.</p>
-      ) : (
-       <div className="interview-list">
-          {upcomingInterviews.map((job) => (
+      <div className="edit-header">
+        <div className="edit-icon">✏️</div>
+        <h2>Edit Job Application</h2>
+        <p>Update your application information</p>
+      </div>
 
-  
-          <div className="interview-card" key={job.id}>
-           <h3>{job.company}</h3>
-           <p>{job.role}</p>
+      {/* Basic Information */}
+      <div className="edit-section">
+        <h3>Basic Information</h3>
 
-            <p>
-              <strong>Date:</strong> {job.interviewDate}
-            </p>
+        <div className="edit-grid">
+          <div className="edit-field">
+            <label>Company Name</label>
+            <input
+              value={editingJob.company}
+              onChange={(event) =>
+                setEditingJob({
+                  ...editingJob,
+                  company: event.target.value,
+                })
+              }
+              required
+            />
+          </div>
 
-            <p className="interview-countdown">
-              {getDaysUntilInterview(job.interviewDate) === 0
-              ? "Interview today!"
-               : getDaysUntilInterview(job.interviewDate) === 1
-               ? "1 day left"
-              : `${getDaysUntilInterview(job.interviewDate)} days left`}
-           </p>
-            <button
-             className="view-button"
-             onClick={() => {
-              setSelectedJob(job);
-              }}
-              >
-             View Details
-            </button>
-            
-            
-{!job.interviewCompleted && (
-  <button
-    className="view-button"
-    onClick={() => completeInterview(job)}
-  >
-    Mark as Completed
-  </button>
-)}
-
-
-            <p>
-              <strong>Time:</strong>{" "}
-              {job.interviewTime || "Not specified"}
-              </p>
-
-              <p>
-              <strong>Round:</strong>{" "}
-              {job.interviewRound || "Not specified"}
-              </p>
-            </div>
-          ))}
-       </div>
-     )}
-     </section>
-<section className="upcoming-interviews">
-  <h2>Completed Interviews</h2>
-
-  {completedInterviews.length === 0 ? (
-    <p>No completed interviews yet.</p>
-  ) : (
-    <div className="interview-list">
-      {completedInterviews.map((job) => (
-        <div className="interview-card" key={job.id}>
-          <h3>{job.company}</h3>
-          <p>{job.role}</p>
-          <p>
-            <strong>Date:</strong> {job.interviewDate || "Not specified"}
-          </p>
-          <p>
-            <strong>Round:</strong> {job.interviewRound || "Not specified"}
-          </p>
-          <p className="interview-countdown">
-            Interview Completed ✓
-          </p>
+          <div className="edit-field">
+            <label>Job Title</label>
+            <input
+              value={editingJob.role}
+              onChange={(event) =>
+                setEditingJob({
+                  ...editingJob,
+                  role: event.target.value,
+                })
+              }
+              required
+            />
+          </div>
         </div>
-      ))}
-    </div>
-  )}
-</section>
 
-      <h2>Edit Job Application</h2>
+        <div className="edit-field">
+          <label>Application Status</label>
+          <select
+            value={editingJob.status}
+            onChange={(event) =>
+              setEditingJob({
+                ...editingJob,
+                status: event.target.value,
+              })
+            }
+          >
+            <option>Applied</option>
+            <option>Interview</option>
+            <option>Offer</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+      </div>
 
-      <label>Company Name</label>
-      <input
-        value={editingJob.company}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            company: event.target.value,
-          })
-        }
-        required
-      />
+      {/* Application Details */}
+      <div className="edit-section">
+        <h3>Application Details</h3>
 
-      <label>Job Title</label>
-      <input
-        value={editingJob.role}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            role: event.target.value,
-          })
-        }
-        required
-      />
+        <div className="edit-field">
+          <label>Job Description</label>
+          <textarea
+            rows="4"
+            value={editingJob.description || ""}
+            onChange={(event) =>
+              setEditingJob({
+                ...editingJob,
+                description: event.target.value,
+              })
+            }
+          />
+        </div>
 
-      <label>Status</label>
-      <select
-        value={editingJob.status}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            status: event.target.value,
-          })
-        }
-      >
-        <option>Applied</option>
-        <option>Interview</option>
-        <option>Offer</option>
-        <option>Rejected</option>
-      </select>
+        <div className="edit-field">
+          <label>Personal Notes</label>
+          <textarea
+            rows="3"
+            value={editingJob.notes || ""}
+            onChange={(event) =>
+              setEditingJob({
+                ...editingJob,
+                notes: event.target.value,
+              })
+            }
+          />
+        </div>
 
-      <label>Job Description</label>
-      <textarea
-        rows="5"
-        value={editingJob.description || ""}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            description: event.target.value,
-          })
-        }
-      />
+        <div className="edit-field">
+          <label>Job Posting URL</label>
+          <input
+            type="url"
+            value={editingJob.jobUrl || ""}
+            onChange={(event) =>
+              setEditingJob({
+                ...editingJob,
+                jobUrl: event.target.value,
+              })
+            }
+            placeholder="https://careers.company.com"
+          />
+        </div>
+      </div>
 
-      <label>Personal Notes</label>
-      <textarea
-        rows="3"
-        value={editingJob.notes || ""}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            notes: event.target.value,
-          })
-        }
-      />
+      {/* Interview Details */}
+      <div className="edit-section">
+        <h3>Interview Details</h3>
 
-      <label>Job Posting URL</label>
-      
-      <label>Interview Date</label>
-    <input
-     type="date"
-     value={editingJob.interviewDate || ""}
-     onChange={(event) =>
-       setEditingJob({
-        ...editingJob,
-        interviewDate: event.target.value,
-       })
-     }
-    />
+        <div className="edit-grid">
+          <div className="edit-field">
+            <label>Interview Date</label>
+            <input
+              type="date"
+              value={editingJob.interviewDate || ""}
+              onChange={(event) =>
+                setEditingJob({
+                  ...editingJob,
+                  interviewDate: event.target.value,
+                })
+              }
+            />
+          </div>
 
-      <label>Interview Time</label>
-    <input
-     type="time"
-     value={editingJob.interviewTime || ""}
-     onChange={(event) =>
-       setEditingJob({
-        ...editingJob,
-        interviewTime: event.target.value,
-      })
-     }
-    />
+          <div className="edit-field">
+            <label>Interview Time</label>
+            <input
+              type="time"
+              value={editingJob.interviewTime || ""}
+              onChange={(event) =>
+                setEditingJob({
+                  ...editingJob,
+                  interviewTime: event.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
 
-      <label>Interview Round</label>
-    <select
-     value={editingJob.interviewRound || ""}
-     onChange={(event) =>
-     setEditingJob({
-       ...editingJob,
-       interviewRound: event.target.value,
-      })
-     }
-     >
-     <option value="">Select interview round</option>
-     <option value="Technical">Technical</option>
-     <option value="HR">HR</option>
-     <option value="Managerial">Managerial</option>
-     <option value="Assignment">Assignment</option>
-     </select>
+        <div className="edit-field">
+          <label>Interview Round</label>
+          <select
+            value={editingJob.interviewRound || ""}
+            onChange={(event) =>
+              setEditingJob({
+                ...editingJob,
+                interviewRound: event.target.value,
+              })
+            }
+          >
+            <option value="">Select interview round</option>
+            <option value="Technical">Technical</option>
+            <option value="HR">HR</option>
+            <option value="Managerial">Managerial</option>
+            <option value="Assignment">Assignment</option>
+          </select>
+        </div>
+      </div>
 
-      <input
-        type="url"
-        value={editingJob.jobUrl || ""}
-        onChange={(event) =>
-          setEditingJob({
-            ...editingJob,
-            jobUrl: event.target.value,
-          })
-        }
-      />
+      <div className="edit-actions">
+        <button
+          type="button"
+          className="cancel-edit"
+          onClick={() => setEditingJob(null)}
+        >
+          Cancel
+        </button>
 
-      <button type="submit">Save Changes</button>
+        <button type="submit" className="save-edit">
+          Save Changes
+        </button>
+      </div>
     </form>
   </div>
 )}
