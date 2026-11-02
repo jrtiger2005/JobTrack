@@ -3,6 +3,8 @@ import React, { useState } from "react";
 function InterviewCalendar({ jobs }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  const [selectedDate, setSelectedDate] = useState(null);
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
@@ -19,6 +21,7 @@ function InterviewCalendar({ jobs }) {
   );
 
   const getInterviewsForDay = (day) => {
+    
     const date = [
       year,
       String(month + 1).padStart(2, "0"),
@@ -27,6 +30,7 @@ function InterviewCalendar({ jobs }) {
 
     return interviews.filter((job) => job.interviewDate === date);
   };
+  const selectedInterviews = selectedDate ? interviews.filter((job) => job.interviewDate === selectedDate) : [];
 
   const changeMonth = (direction) => {
     setCurrentDate(new Date(year, month + direction, 1));
@@ -60,8 +64,20 @@ function InterviewCalendar({ jobs }) {
           const dayInterviews = getInterviewsForDay(day);
 
           return (
-            <div className="calendar-cell" key={day}>
-              <span>{day}</span>
+              <div
+                 className={`calendar-cell ${
+                     selectedDate === `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                       ? "selected-date"
+                       : ""
+                       }`}
+                       key={day}
+                       onClick={() =>
+                         setSelectedDate(
+                         `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                          )
+                       }
+                     >
+                     <span>{day}</span>
 
               {dayInterviews.map((job) => (
                 <div className="calendar-event" key={job.id}>
@@ -73,6 +89,30 @@ function InterviewCalendar({ jobs }) {
           );
         })}
       </div>
+           {selectedDate && (
+             <div className="selected-interviews">
+                <h3>Interviews on {selectedDate}</h3>
+
+               {selectedInterviews.length === 0 ? (
+               <p>No interviews scheduled for this date.</p>
+              ) : (
+               selectedInterviews.map((job) => (
+                <div className="interview-card" key={job.id}>
+                <h3>{job.company}</h3>
+                <p>{job.role}</p>
+                <p>
+                   <strong>Time:</strong>{" "}
+                   {job.interviewTime || "Not specified"}
+                </p>
+              <p>
+                 <strong>Round:</strong>{" "}
+                 {job.interviewRound || "Not specified"}
+              </p>
+            </div>
+           ))
+        )}
+     </div>
+    )}
     </section>
   );
 }
