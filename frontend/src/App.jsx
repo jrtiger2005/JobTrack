@@ -2,6 +2,19 @@
 import {useEffect ,useState } from "react";
 import "./App.css";
 import InterviewCalendar from "./InterviewCalendar.jsx";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
 
 function App() {
   const [jobs, setJobs] = useState([]);
@@ -45,6 +58,69 @@ function App() {
     offers: jobs.filter((job) => job.status === "Offer").length,
     completed: jobs.filter((job) => job.interviewCompleted === true).length,
   };
+      const rejectedCount = jobs.filter((job) => job.status === "Rejected").length;
+      const responseCount =
+       counts.interviews + counts.offers + counts.completed;
+
+      const responseRate =
+        counts.total === 0
+       ? 0
+        : Math.round((responseCount / counts.total) * 100);
+
+      const interviewToOfferRate =
+      counts.interviews + counts.offers === 0
+       ? 0
+      : Math.round(
+        (counts.offers / (counts.interviews + counts.offers)) * 100
+      );
+
+      const statusData = [
+      { name: "Applied", value: counts.applied },
+      { name: "Interview", value: counts.interviews },
+      { name: "Offer", value: counts.offers },
+    {
+      name: "Rejected",
+      value: jobs.filter((job) => job.status === "Rejected").length,
+    },
+   ];
+
+   const STATUS_COLORS = [
+     "#6366f1",
+     "#f59e0b",
+     "#22c55e",
+     "#ef4444",
+    ];
+    const monthlyData = (() => {
+  const months = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(1);
+    date.setMonth(date.getMonth() - i);
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+
+    const applications = jobs.filter((job) => {
+      if (!job.appliedDate) return false;
+
+      const appliedDate = new Date(`${job.appliedDate}T00:00:00`);
+
+      return (
+        appliedDate.getFullYear() === year &&
+        appliedDate.getMonth() === month
+      );
+    }).length;
+
+    months.push({
+      month: date.toLocaleString("en-US", { month: "short" }),
+      applications,
+    });
+  }
+
+  return months;
+})();
+
 
   const interviewSuccessRate =
   counts.interviews + counts.completed === 0
@@ -321,7 +397,78 @@ async function deleteJob(id) {
           <Stat title="Interviews" value={counts.interviews} />
           <Stat title="Offers" value={counts.offers} />
           <Stat title="Completed Interviews" value={counts.completed} />
+          <Stat title="Response Rate" value={`${responseRate}%`} />
+          <Stat
+            title="Interview to Offer Rate"
+            value={`${interviewToOfferRate}%`}
+          />
         </section>
+
+              <section className="panel analytics-panel">
+                <div className="section-heading">
+                 <div>
+                  <h2>Application Status</h2>
+                    <p className="muted">
+                      Distribution of your job applications
+                       </p>
+                        </div>
+                           </div>
+
+                       <div style={{ width: "100%", height: "300px" }}>
+                       <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                         <Pie
+                         data={statusData}
+                           dataKey="value"
+                           nameKey="name"
+                           cx="50%"
+                           cy="50%"
+                           innerRadius={65}
+                           outerRadius={105}
+                           paddingAngle={4}
+                          >
+                      {statusData.map((entry, index) => (
+                         <Cell
+                            key={entry.name}
+                            fill={STATUS_COLORS[index]}
+                          />
+                            ))}
+                           </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                   </ResponsiveContainer>
+                </div>
+             </section>
+             <section className="panel analytics-panel">
+                <div className="section-heading">
+                 <div>
+                  <h2>Monthly Application Trend</h2>
+                    <p className="muted">
+                      Applications submitted over the last 6 months
+                      </p>
+                      </div>
+                         </div>
+
+                 <div style={{ width: "100%", height: "300px" }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                   <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                   <XAxis dataKey="month" stroke="#9ca3af" />
+                    <YAxis allowDecimals={false} stroke="#9ca3af" />
+                   <Tooltip />
+                 <Line
+                       type="monotone"
+                       dataKey="applications"
+                       stroke="#e2efee"
+                       strokeWidth={3}
+                        dot={{ r: 5 }}
+                       activeDot={{ r: 7 }}
+                         /> 
+                   </LineChart>
+                   </ResponsiveContainer>
+             </div>
+           </section>
 
         <section className="panel">
           <h2>Interview Completion Rate</h2>
