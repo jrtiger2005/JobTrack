@@ -19,12 +19,15 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthController(
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -57,7 +60,33 @@ public class AuthController {
                         savedUser.getName(),
                         savedUser.getEmail()
                 ));
-    }
+        }
+             @PostMapping("/login")
+         public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+
+         String email = request.email().trim().toLowerCase();
+
+         User user = userRepository.findByEmail(email).orElse(null);
+
+         if (user == null ||
+                !passwordEncoder.matches(
+                        request.password(), user.getPassword())) {
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                   .body("Invalid email or password.");
+         }
+
+          String token = jwtService.generateToken(user.getEmail());
+
+             return ResponseEntity.ok(
+                   new LoginResponse(
+                       user.getId(),
+                       user.getName(),
+                       user.getEmail(),
+                       token
+                )
+          );
+        }
 
     public record RegisterRequest(
             String name,
@@ -65,9 +94,22 @@ public class AuthController {
             String password) {
     }
 
+    public record LoginRequest(
+            String email,
+            String password) {
+    }
+
+
     public record AuthResponse(
             Long id,
             String name,
             String email) {
+    }
+
+    public record LoginResponse(
+            Long id,
+            String name,
+            String email,
+            String token) {
     }
 }

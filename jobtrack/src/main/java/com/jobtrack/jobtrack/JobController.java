@@ -4,6 +4,7 @@ package com.jobtrack.jobtrack;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,36 +15,60 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jobtrack.jobtrack.model.Job;
+import com.jobtrack.jobtrack.model.User;
 import com.jobtrack.jobtrack.repository.JobRepository;
+import com.jobtrack.jobtrack.repository.UserRepository;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 public class JobController {
 
     private final JobRepository jobRepository;
+    private final UserRepository userRepository;
 
-    public JobController(JobRepository jobRepository) {
+    public JobController(JobRepository jobRepository,UserRepository userRepository) {
         this.jobRepository = jobRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/api/jobs")
-    public List<Job> getJobs() {
-        return jobRepository.findAll();
+    public List<Job> getJobs(Authentication authentication) {
+        String email = authentication.getName();
+
+        return jobRepository.findByUserEmail(email);
     }
 
     @PostMapping("/api/jobs")
-    public Job addJob(@RequestBody Job job) {
-        return jobRepository.save(job);
-    }
-        
-@PutMapping("/api/jobs/{id}")
-public Job updateJob(
-        @PathVariable Long id,
-        @RequestBody Job updatedJob) {
+public Job addJob(
+        @RequestBody Job job,
+        Authentication authentication) {
 
-    Job existingJob = jobRepository.findById(id)
-            .orElseThrow(() ->
-                    new RuntimeException("Job not found: " + id));
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    job.setUser(user);
+
+    return jobRepository.save(job);
+}
+        
+    @PutMapping("/api/jobs/{id}")
+public ResponseEntity<?> updateJob(
+        @PathVariable Long id,
+        @RequestBody Job updatedJob,
+        Authentication authentication) {
+
+    String email = authentication.getName();
+
+    Job existingJob = jobRepository
+            .findByIdAndUserEmail(id, email)
+            .orElse(null);
+
+    if (existingJob == null) {
+        return ResponseEntity.notFound().build();
+    }
 
     existingJob.setCompany(updatedJob.getCompany());
     existingJob.setRole(updatedJob.getRole());
@@ -58,18 +83,28 @@ public Job updateJob(
     existingJob.setInterviewRound(updatedJob.getInterviewRound());
     existingJob.setInterviewCompleted(updatedJob.isInterviewCompleted());
 
-    return jobRepository.save(existingJob);
+    return ResponseEntity.ok(jobRepository.save(existingJob));
 }
 
    
-    @DeleteMapping("/api/jobs/{id}")
-    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
-        if(!jobRepository.existsById(id)){
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping ("/api/jobs/{id}")
+    public ResponseEntity<?> deleteJob(
+        @PathVariable Long id,
+        Authentication authentication) {
 
-        jobRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }
+            String email = authentication.getName();
+
+            Job job = jobRepository
+                    .findByIdAndUserEmail(id, email)
+                    .orElse(null);
+
+            if(job == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            jobRepository.delete(job);
+
+            return ResponseEntity.ok().build();
      
-}
+        }   
+ }
