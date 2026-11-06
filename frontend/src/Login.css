@@ -1,0 +1,250 @@
+
+* {
+  box-sizing: border-box;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #ffffff;
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+/* Left branding panel */
+.login-brand-panel {
+  background: linear-gradient(145deg, #101d3a, #172f59 60%, #234b80);
+  color: #ffffff;
+  padding: 55px 9%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+}
+
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #3978ed;
+  color: white;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.brand-content {
+  max-width: 510px;
+  margin: 55px 0;
+}
+
+.brand-tag,
+.form-eyebrow {
+  color: #76a8ff;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 2px;
+}
+
+.brand-content h1 {
+  font-size: clamp(35px, 4vw, 54px);
+  line-height: 1.13;
+  letter-spacing: -1.8px;
+  margin: 22px 0;
+}
+
+.brand-content > p {
+  color: #c2cde0;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.brand-features {
+  display: grid;
+  gap: 17px;
+  margin-top: 38px;
+  color: #e0e9f8;
+  font-size: 14px;
+}
+
+.brand-features div::first-letter {
+  color: #77aaff;
+}
+
+.brand-footer {
+  color: #a8b9d3;
+  font-size: 12px;
+}
+
+/* Right login panel */
+.login-form-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 45px 30px;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 420px;
+}
+
+.mobile-brand {
+  display: none;
+}
+
+.form-eyebrow {
+  color: #3978ed;
+}
+
+.login-form h2 {
+  color: #14213d;
+  font-size: 31px;
+  letter-spacing: -1px;
+  margin: 15px 0 10px;
+}
+
+.form-description {
+  color: #78849a;
+  font-size: 14px;
+  margin-bottom: 35px;
+}
+
+.login-form label {
+  display: block;
+  color: #26344d;
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 9px;
+}
+
+.login-form input {
+  width: 100%;
+  height: 51px;
+  border: 1px solid #dce2ec;
+  border-radius: 9px;
+  padding: 0 15px;
+  margin-bottom: 23px;
+  font-size: 14px;
+  color: #17243c;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.login-form input:focus {
+  border-color: #3978ed;
+  box-shadow: 0 0 0 3px rgba(57, 120, 237, 0.12);
+}
+
+.login-form input::placeholder {
+  color: #a3adbd;
+}
+
+.password-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 65px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+  border: none;
+  background: transparent;
+  color: #3978ed;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 9px;
+  background: #2868dc;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.login-button:hover {
+  background: #1954be;
+  transform: translateY(-1px);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-error {
+  background: #fff0f0;
+  color: #c62828;
+  border: 1px solid #ffd4d4;
+  border-radius: 8px;
+  padding: 11px;
+  font-size: 13px;
+  margin: 0 0 18px;
+}
+
+.login-security {
+  text-align: center;
+  color: #9aa4b5;
+  font-size: 12px;
+  margin-top: 27px;
+}
+
+/* Mobile responsive */
+@media (max-width: 800px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-brand-panel {
+    display: none;
+  }
+
+  .login-form-panel {
+    min-height: 100vh;
+    padding: 35px 24px;
+  }
+
+  .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 23px;
+    font-weight: 750;
+    color: #14213d;
+    margin-bottom: 55px;
+  }
+
+  .login-form h2 {
+    font-size: 27px;
+  }
+}

@@ -1,6 +1,7 @@
 
 import {useEffect ,useState } from "react";
 import "./App.css";
+import Login from "./Login";
 import InterviewCalendar from "./InterviewCalendar.jsx";
 import {
   PieChart,
@@ -17,6 +18,17 @@ import {
 } from "recharts";
 
 function App() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(
+  Boolean(localStorage.getItem("token"))
+  );
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  setCurrentUser(null);
+  setIsAuthenticated(false);
+  setJobs([]);
+};
+  const [currentUser, setCurrentUser] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -31,7 +43,15 @@ function App() {
   const [selectedJob,setSelectedJob] = useState(null);
 
   useEffect(() => {
-  fetch("http://localhost:8080/api/jobs")
+  const token = localStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/jobs", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("Failed to load jobs");
@@ -43,13 +63,13 @@ function App() {
       setError("");
     })
     .catch((err) => {
-      console.error("Loading jobs failed:",err);
-      setError("Could not load jobs.check that Spring Boot is running.");
+      console.error("Loading jobs failed:", err);
+      setError("Could not load jobs. Please log in again.");
     })
     .finally(() => {
       setLoading(false);
-    })
-}, []);
+    });
+}, [isAuthenticated]);
 
   const counts = {
     total: jobs.length,
@@ -371,13 +391,25 @@ async function deleteJob(id) {
   }
 }
 
- 
+ if (!isAuthenticated) {
+  return (
+    <Login
+      onLoginSuccess={(user) => {
+        setCurrentUser(user);
+        setIsAuthenticated(true);
+      }}
+    />
+  );
+}
   return (
     <div className="app">
       <aside className="sidebar">
         <h2>◈ JobTrack</h2>
         <p className="nav-active">▦ Dashboard</p>
         <p>▤ Applications</p>
+        <button className="logout-button" onClick={handleLogout}>
+         Logout
+        </button>
         <div className="sidebar-bottom">Your career, organized.</div>
       </aside>
 
