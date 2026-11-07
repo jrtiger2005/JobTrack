@@ -2,6 +2,7 @@
 import {useEffect ,useState } from "react";
 import "./App.css";
 import Login from "./Login";
+import Register from "./Register.jsx";
 import InterviewCalendar from "./InterviewCalendar.jsx";
 import {
   PieChart,
@@ -22,6 +23,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
   Boolean(localStorage.getItem("token"))
   );
+  const [showRegister, setShowRegister] = useState(false);
+
   const handleLogout = () => {
   localStorage.removeItem("token");
   setCurrentUser(null);
@@ -391,13 +394,18 @@ async function deleteJob(id) {
   }
 }
 
- if (!isAuthenticated) {
-  return (
+if (!isAuthenticated) {
+  return showRegister ? (
+    <Register
+      onSwitchToLogin={() => setShowRegister(false)}
+    />
+  ) : (
     <Login
       onLoginSuccess={(user) => {
         setCurrentUser(user);
         setIsAuthenticated(true);
       }}
+      onSwitchToRegister={() => setShowRegister(true)}
     />
   );
 }

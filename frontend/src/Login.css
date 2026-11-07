@@ -107,7 +107,7 @@
 }
 
 .login-form h2 {
-  color: #14213d;
+  color: #101624;
   font-size: 31px;
   letter-spacing: -1px;
   margin: 15px 0 10px;
@@ -135,7 +135,7 @@
   padding: 0 15px;
   margin-bottom: 23px;
   font-size: 14px;
-  color: #17243c;
+  color: #e8effa;
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
 }

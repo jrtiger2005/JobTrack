@@ -2,7 +2,7 @@
 import { useState } from "react";
 import "./Login.css";
 
-function Login({ onLoginSuccess }) {
+function Login({ onLoginSuccess, onSwitchToRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,12 +26,21 @@ function Login({ onLoginSuccess }) {
         }
       );
 
-      const data = await response.json();
+        const responseText = await response.text();
 
-      if (!response.ok) {
-        throw new Error("Invalid email or password.");
-      }
+      let data = {};
 
+       try {
+       data = JSON.parse(responseText);
+       } catch {
+      data = { message: responseText };
+     }
+
+        if (!response.ok) {
+           throw new Error(
+           data.message || data.error || "Invalid email or password."
+          );
+         }
       localStorage.setItem("token", data.token);
       onLoginSuccess(data);
     } catch (err) {
@@ -126,10 +135,16 @@ function Login({ onLoginSuccess }) {
             {loading ? "Signing in..." : "Sign in"}
             {!loading && <span>→</span>}
           </button>
-
-          <p className="login-security">
-            Your career dashboard, all in one place.
-          </p>
+           <p className="login-security">
+              Don't have an account?{" "}
+            <button
+            type="button"
+            className="password-toggle"
+            onClick={onSwitchToRegister}
+             >
+             Create an account
+            </button>
+            </p>
         </form>
       </div>
     </div>
