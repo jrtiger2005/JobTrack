@@ -1,0 +1,197 @@
+
+.profile-page {
+  min-height: 100vh;
+  padding: 35px;
+  background: #f4f7fc;
+  color: #17243c;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.profile-back {
+  border: none;
+  background: transparent;
+  color: #2868dc;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 25px;
+}
+
+.profile-card {
+  max-width: 650px;
+  margin: 20px auto;
+  padding: 35px;
+  background: #ffffff;
+  border: 1px solid #e6eaf1;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(20, 40, 80, 0.06);
+}
+
+.profile-card h1 {
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+.profile-card > p {
+  color: #7c8799;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.profile-avatar {
+  width: 85px;
+  height: 85px;
+  display: grid;
+  place-items: center;
+  margin: 25px 0;
+  border-radius: 50%;
+  background: #e8efff;
+  color: #2868dc;
+  font-size: 34px;
+  font-weight: 750;
+}
+
+.profile-card form {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-card label {
+  margin: 15px 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #34425a;
+}
+
+.profile-card input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #dce3ed;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  color: #d3d3d3;
+}
+
+.profile-card input:focus {
+  border-color: #2868dc;
+  box-shadow: 0 0 0 3px rgba(40, 104, 220, 0.1);
+}
+
+.profile-card input:disabled {
+  background: #f3f5f8;
+  color: #8490a2;
+  cursor: not-allowed;
+}
+
+.profile-card form button {
+  height: 48px;
+  margin-top: 28px;
+  border: none;
+  border-radius: 8px;
+  background: #2868dc;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.profile-card form button:hover {
+  background: #1954be;
+}
+
+.profile-card form button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.profile-error {
+  color: #c62828;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+.profile-success {
+  color: #16834a;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+  .profile-page {
+    padding: 20px 12px;
+  }
+
+  .profile-card {
+    padding: 23px 18px;
+  }
+}
+
+/* Change Password Section */
+.change-password-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #e6eaf1;
+}
+
+.change-password-section h2 {
+  color: #17243c;
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+
+.change-password-section > p {
+  color: #7c8799;
+  font-size: 14px;
+  margin-bottom: 22px;
+}
+
+.change-password-section form {
+  display: flex;
+  flex-direction: column;
+}
+
+.change-password-section label {
+  margin: 13px 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #34425a;
+}
+
+.change-password-section input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #dce3ed;
+  border-radius: 8px;
+  outline: none;
+}
+
+.change-password-section input:focus {
+  border-color: #2868dc;
+  box-shadow: 0 0 0 3px rgba(40, 104, 220, 0.1);
+}
+
+.change-password-section button {
+  height: 48px;
+  margin-top: 22px;
+  border: none;
+  border-radius: 8px;
+  background: #172f59;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.change-password-section button:hover {
+  background: #2868dc;
+}
+
+.password-message {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #16834a;
+}
+

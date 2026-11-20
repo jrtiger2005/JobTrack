@@ -1,10 +1,12 @@
 
 import {useEffect ,useState } from "react";
 import "./App.css";
+import Profile from "./Profile.jsx";
 import Login from "./Login";
 import Register from "./Register.jsx";
 import InterviewCalendar from "./InterviewCalendar.jsx";
 import {
+  Area,
   PieChart,
   Pie,
   Cell,
@@ -20,6 +22,7 @@ import {
 
 function App() {
 
+  const [showProfile, setShowProfile] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(
   Boolean(localStorage.getItem("token"))
   );
@@ -253,6 +256,7 @@ async function saveEditedJob(event) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           company: editingJob.company,
@@ -305,6 +309,7 @@ async function addJob(event) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         company: company.trim(),
@@ -350,6 +355,7 @@ async function updateStatus(id, status) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
         company: job.company,
@@ -380,6 +386,9 @@ async function deleteJob(id) {
   try {
     const response = await fetch(`http://localhost:8080/api/jobs/${id}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      },
     });
 
     if (!response.ok) {
@@ -411,10 +420,29 @@ if (!isAuthenticated) {
 }
   return (
     <div className="app">
+         {showProfile ? (
+        <Profile onBack={() => setShowProfile(false)} />
+        ) : (
+       <>
+        
       <aside className="sidebar">
-        <h2>◈ JobTrack</h2>
-        <p className="nav-active">▦ Dashboard</p>
-        <p>▤ Applications</p>
+      <h2>◈ JobTrack</h2>
+
+      <p
+       className={!showProfile ? "nav-active" : ""}
+       onClick={() => setShowProfile(false)}
+      >
+       ▦ Dashboard
+     </p>
+
+     <p
+       className={showProfile ? "nav-active" : ""}
+       onClick={() => setShowProfile(true)}
+      >
+       ◉ My Profile
+      </p>
+
+      <p>▤ Applications</p>
         <button className="logout-button" onClick={handleLogout}>
          Logout
         </button>
@@ -456,27 +484,52 @@ if (!isAuthenticated) {
 
                        <div style={{ width: "100%", height: "300px" }}>
                        <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                         <Pie
-                         data={statusData}
-                           dataKey="value"
-                           nameKey="name"
-                           cx="50%"
-                           cy="50%"
-                           innerRadius={65}
-                           outerRadius={105}
-                           paddingAngle={4}
-                          >
-                      {statusData.map((entry, index) => (
-                         <Cell
-                            key={entry.name}
-                            fill={STATUS_COLORS[index]}
-                          />
-                            ))}
-                           </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </PieChart>
+                        
+                 <PieChart>
+                 <Pie
+                data={statusData}
+                dataKey="value"
+               nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={110}
+                paddingAngle={5}
+                cornerRadius={6}
+                stroke="none"
+                animationDuration={1000}
+                animationEasing="ease-out"
+                >
+               {statusData.map((entry, index) => (
+              <Cell
+               key={entry.name}
+              fill={STATUS_COLORS[index]}
+              />
+              ))}
+            </Pie>
+
+            <Tooltip
+            contentStyle={{
+                backgroundColor: "#172554",
+                border: "1px solid #60a5fa",
+                borderRadius: "12px",
+                color: "#ffffff",
+                padding: "12px"
+                }}
+               itemStyle={{ color: "#ffffff" }}
+               />
+
+            <Legend
+            verticalAlign="bottom"
+            height={40}
+            wrapperStyle={{
+            paddingTop: "15px",
+            fontSize: "14px",
+            fontWeight: 600
+             }}
+             />
+            </PieChart>
+
                    </ResponsiveContainer>
                 </div>
              </section>
@@ -492,20 +545,74 @@ if (!isAuthenticated) {
 
                  <div style={{ width: "100%", height: "300px" }}>
                   <ResponsiveContainer width="100%" height="100%">
-                   <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                   <XAxis dataKey="month" stroke="#9ca3af" />
-                    <YAxis allowDecimals={false} stroke="#9ca3af" />
-                   <Tooltip />
-                 <Line
-                       type="monotone"
-                       dataKey="applications"
-                       stroke="#e2efee"
-                       strokeWidth={3}
-                        dot={{ r: 5 }}
-                       activeDot={{ r: 7 }}
-                         /> 
+                   
+                <LineChart data={monthlyData}>
+              <defs>
+             <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.45} />
+              <stop offset="95%" stopColor="#2563eb" stopOpacity={0.02} />
+             </linearGradient>
+            </defs>
+
+             <CartesianGrid
+               strokeDasharray="3 3"
+              stroke="#475569"
+             vertical={false}
+              />
+
+              <XAxis
+              dataKey="month"
+                stroke="#cbd5e1"
+                 tickLine={false}
+                 axisLine={false}
+                  />
+
+               <YAxis
+                 allowDecimals={false}
+                stroke="#cbd5e1"
+                tickLine={false}
+                 axisLine={false}
+                 />
+
+                <Tooltip
+                contentStyle={{
+                backgroundColor: "#172554",
+                border: "1px solid #60a5fa",
+                borderRadius: "12px",
+                color: "#ffffff",
+                 padding: "12px"
+                   }}
+                 labelStyle={{ color: "#93c5fd", fontWeight: 700 }}
+                 />
+
+               <Area
+                type="monotone"
+                  dataKey="applications"
+                     stroke="none"
+                    fill="url(#trendGradient)"
+                      />
+
+                    <Line
+                  type="monotone"
+                 dataKey="applications"
+                 stroke="#60a5fa"
+                 strokeWidth={3.5}
+                 dot={{
+                    r: 5,
+                   fill: "#ffffff",
+                  stroke: "#60a5fa",
+                 strokeWidth: 3
+                  }}
+               activeDot={{
+                 r: 8,
+                fill: "#60a5fa",
+                stroke: "#ffffff",
+               strokeWidth: 2
+               }}
+                animationDuration={1200}
+                   />
                    </LineChart>
+
                    </ResponsiveContainer>
              </div>
            </section>
@@ -985,7 +1092,10 @@ if (!isAuthenticated) {
 
 
       </main>
+        </>
+       )}
     </div>
+      
   );
 }
 
