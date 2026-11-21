@@ -127,7 +127,7 @@ JobTrack uses JWT-based authentication to secure protected API endpoints.
 ![JobTrack Applications](screenshots/applications.png)
 
 ### 3. Interview Calendar
-![JobTrack Interview Calendar](screenshots/interview-calendar.png)
+![JobTrack Interview Calendar](screenshots/interviewcalendar.png)
 
 ### 4. jobtrack Sign in page
 ![ Jobtrack Sign in page](screenshots/jobtracksignin.png)
