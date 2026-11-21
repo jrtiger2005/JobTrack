@@ -47,6 +47,7 @@ function App() {
   const [jobUrl, setJobUrl] = useState("");
   const [editingJob, setEditingJob] = useState(null);
   const [selectedJob,setSelectedJob] = useState(null);
+  const [showApplications, setShowApplications] = useState(false);
 
   useEffect(() => {
   const token = localStorage.getItem("token");
@@ -206,6 +207,7 @@ async function completeInterview(job) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           company: job.company,
@@ -420,34 +422,182 @@ if (!isAuthenticated) {
 }
   return (
     <div className="app">
-         {showProfile ? (
-        <Profile onBack={() => setShowProfile(false)} />
-        ) : (
-       <>
-        
       <aside className="sidebar">
-      <h2>◈ JobTrack</h2>
+  <h2>◈ JobTrack</h2>
 
-      <p
-       className={!showProfile ? "nav-active" : ""}
-       onClick={() => setShowProfile(false)}
-      >
-       ▦ Dashboard
-     </p>
+  <p
+    className={!showProfile && !showApplications ? "nav-active" : ""}
+    onClick={() => {
+      setShowProfile(false);
+      setShowApplications(false);
+    }}
+  >
+    ▦ Dashboard
+  </p>
 
-     <p
-       className={showProfile ? "nav-active" : ""}
-       onClick={() => setShowProfile(true)}
-      >
-       ◉ My Profile
-      </p>
+  <p
+    className={showProfile ? "nav-active" : ""}
+    onClick={() => {
+      setShowProfile(true);
+      setShowApplications(false);
+    }}
+  >
+    ◉ My Profile
+  </p>
 
-      <p>▤ Applications</p>
-        <button className="logout-button" onClick={handleLogout}>
-         Logout
+  <p
+    className={showApplications ? "nav-active" : ""}
+    onClick={() => {
+      setShowProfile(false);
+      setShowApplications(true);
+    }}
+  >
+    ▤ Applications
+  </p>
+
+  <button className="logout-button" onClick={handleLogout}>
+    Logout
+  </button>
+
+  <div className="sidebar-bottom">Your career, organized.</div>
+</aside>
+        {showProfile ? (
+       <Profile onBack={() => setShowProfile(false)} />
+           ) : showApplications ? (
+           <main className="main">
+           <header className="topbar">
+           <div>
+           <p className="eyebrow">WORKSPACE / APPLICATIONS</p>
+           <h1>Applications</h1>
+           <p className="muted">Manage all your job applications.</p>
+           </div>
+           </header>
+               <section className="panel">
+          <div className="section-heading">
+            <div>
+              <h2>Your applications</h2>
+              <p className="muted">Review and manage your opportunities.</p>
+            </div>
+            <span className="count">{jobs.length} jobs</span>
+          </div>
+            
+          <div className="filters">
+            <input
+            type="text"
+            placeholder="Search company or role..."
+            value={search}
+             onChange={(event) => setSearch(event.target.value)}
+           />
+
+         <select
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value)}
+       >
+          <option value="All">All statuses</option>
+          <option value="Applied">Applied</option>
+          <option value="Interview">Interview</option>
+          <option value="Offer">Offer</option>
+          <option value="Rejected">Rejected</option>
+          </select>
+           </div>
+
+
+
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>COMPANY / ROLE</th>
+                  <th>DESCRIPTION</th>
+                  <th>DATE APPLIED</th>
+                  <th>STATUS</th>
+                  <th>ACTION</th>
+                </tr>
+              </thead>
+              
+               
+<tbody>
+  {loading && (
+    <tr>
+      <td colSpan="5">Loading applications...</td>
+    </tr>
+  )}
+
+  {error && (
+    <tr>
+      <td colSpan="5">{error}</td>
+    </tr>
+  )}
+
+  {filteredJobs.map((job) => (
+    <tr key={job.id}>
+      <td>
+        <strong>{job.company}</strong>
+        <span className="role">{job.role}</span>
+        <button
+         className="view-button"
+         onClick={() => {
+          setEditingJob({ ...job});
+          setSelectedJob(null);
+         }}
+         >
+          Edit Job
+          View Details
+
+         </button>
+      </td>
+
+      <td>
+        {job.description || "No description"}
+      </td>
+
+      <td>{job.appliedDate}</td>
+
+      <td>
+        <select
+          className={`status status-${job.status.toLowerCase()}`}
+          value={job.status}
+          onChange={(event) =>
+            updateStatus(job.id, event.target.value)
+          }
+        >
+          <option>Applied</option>
+          <option>Interview</option>
+          <option>Offer</option>
+          <option>Rejected</option>
+        </select>
+      </td>
+
+      <td>
+        <button
+          className="delete-button"
+          onClick={() => deleteJob(job.id)}
+        >
+          Delete
         </button>
-        <div className="sidebar-bottom">Your career, organized.</div>
-      </aside>
+      </td>
+    </tr>
+  ))}
+
+  {!loading && !error && filteredJobs.length === 0 && (
+    <tr>
+      <td colSpan="5" className="empty">
+        No matching applications found.
+      </td>
+    </tr>
+  )}
+</tbody>
+
+
+            </table>
+          </div>
+        </section>
+
+           </main>
+           ) : (
+          <>
+        
+      
 
       <main className="main">
         <header className="topbar">
@@ -637,6 +787,7 @@ if (!isAuthenticated) {
          jobs={jobs}
          onEdit={setEditingJob}
          onDelete={deleteJob}
+         onComplete={completeInterview}
        />
 
         <section className="panel">

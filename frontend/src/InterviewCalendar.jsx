@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function InterviewCalendar({ jobs, onEdit, onDelete }) {
+function InterviewCalendar({ jobs, onEdit, onDelete, onComplete }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -111,21 +111,34 @@ function InterviewCalendar({ jobs, onEdit, onDelete }) {
                     {job.interviewRound || "Not specified"}
                    </p>
 
-                <div className="calendar-actions">
-          <button
-             className="view-button"
-             onClick={() => onEdit(job)}
-             >
-             Edit Interview
-          </button>
+            <div className="calendar-actions">
+  <button
+    className="view-button"
+    onClick={() => onEdit(job)}
+  >
+    Edit Interview
+  </button>
 
-          <button
-            className="delete-button"
-            onClick={() => onDelete(job.id)}
-          >
-           Delete Interview
-          </button>
-       </div>
+  {!job.interviewCompleted ? (
+    <button
+      className="complete-button"
+      onClick={() => onComplete(job)}
+    >
+      Mark as Completed ✓
+    </button>
+  ) : (
+    <span className="completed-label">
+      Completed ✓
+    </span>
+  )}
+
+  <button
+    className="delete-button"
+    onClick={() => onDelete(job.id)}
+  >
+    Delete Interview
+  </button>
+</div>
       </div>
            ))
         )}
