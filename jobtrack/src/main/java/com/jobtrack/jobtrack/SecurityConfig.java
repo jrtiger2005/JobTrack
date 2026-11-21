@@ -58,6 +58,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
+public org.springframework.security.core.userdetails.UserDetailsService userDetailsService() {
+    return username -> {
+        throw new org.springframework.security.core.userdetails.UsernameNotFoundException(
+            "User not found"
+        );
+    };
+}
+    @Bean
       public CorsConfigurationSource corsConfigurationSource() {
 
       CorsConfiguration configuration = new CorsConfiguration();
