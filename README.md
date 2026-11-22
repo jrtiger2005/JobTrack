@@ -1,3 +1,9 @@
+# 🚀 JobTrack – Job Application Tracker
+
+**🌐 Live Demo:** https://jobtrack-frontend-0ald.onrender.com
+
+**💻 GitHub Repository:** https://github.com/jrtiger2005/JobTrack
+
 
 # 🚀 JobTrack — Smart Job Application Tracker
 
@@ -92,7 +98,7 @@ Then run:
 
 Backend runs at:
 
-`http://localhost:8080`
+`https://jobtrack-backend-yl5a.onrender.com`
 
 ### 3. Frontend Setup
 
