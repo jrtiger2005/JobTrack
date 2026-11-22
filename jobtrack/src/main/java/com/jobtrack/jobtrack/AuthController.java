@@ -14,7 +14,10 @@ import com.jobtrack.jobtrack.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {
+    "http://localhost:5173",
+    "https://jobtrack-frontend-0ald.onrender.com"
+})
 public class AuthController {
 
     private final UserRepository userRepository;

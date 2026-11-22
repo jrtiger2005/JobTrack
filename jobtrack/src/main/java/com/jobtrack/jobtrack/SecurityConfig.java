@@ -71,7 +71,9 @@ public org.springframework.security.core.userdetails.UserDetailsService userDeta
       CorsConfiguration configuration = new CorsConfiguration();
 
       configuration.setAllowedOrigins(
-        List.of("http://localhost:5173")
+        List.of("http://localhost:5173",
+             "https://jobtrack-frontend-0ald.onrender.com"
+        )
       );
 
       configuration.setAllowedMethods(
