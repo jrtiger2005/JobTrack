@@ -19,7 +19,7 @@ function Profile({ onBack }) {
         const token = localStorage.getItem("token");
 
         const response = await fetch(
-          "http://localhost:8080/api/users/me",
+          "https://jobtrack-backend-yl5a.onrender.com/api/users/me",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ function Profile({ onBack }) {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/users/me",
+        "https://jobtrack-backend-yl5a.onrender.com/api/users/me",
         {
           method: "PUT",
           headers: {
@@ -96,7 +96,7 @@ function Profile({ onBack }) {
 
   try {
     const response = await fetch(
-      "http://localhost:8080/api/users/change-password",
+      "https://jobtrack-backend-yl5a.onrender.com/api/users/change-password",
       {
         method: "PUT",
         headers: {

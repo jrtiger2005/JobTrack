@@ -52,7 +52,7 @@ function App() {
   useEffect(() => {
   const token = localStorage.getItem("token");
 
-  fetch("http://localhost:8080/api/jobs", {
+  fetch("https://jobtrack-backend-yl5a.onrender.com/api/jobs", {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -202,7 +202,7 @@ const upcomingInterviews = jobs
 async function completeInterview(job) {
   try {
     const response = await fetch(
-      `http://localhost:8080/api/jobs/${job.id}`,
+      `https://jobtrack-backend-yl5a.onrender.com/api/jobs/${job.id}`,
       {
         method: "PUT",
         headers: {
@@ -253,7 +253,7 @@ async function saveEditedJob(event) {
 
   try {
     const response = await fetch(
-      `http://localhost:8080/api/jobs/${editingJob.id}`,
+      `https://jobtrack-backend-yl5a.onrender.com/api/jobs/${editingJob.id}`,
       {
         method: "PUT",
         headers: {
@@ -307,7 +307,7 @@ async function addJob(event) {
     console.log("Description being sent:", description);
     
 
-    const response = await fetch("http://localhost:8080/api/jobs", {
+    const response = await fetch("https://jobtrack-backend-yl5a.onrender.com/api/jobs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -353,7 +353,7 @@ async function updateStatus(id, status) {
   if (!job) return;
 
   try {
-    const response = await fetch(`http://localhost:8080/api/jobs/${id}`, {
+    const response = await fetch(`https://jobtrack-backend-yl5a.onrender.com/api/jobs/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -386,7 +386,7 @@ async function updateStatus(id, status) {
     
 async function deleteJob(id) {
   try {
-    const response = await fetch(`http://localhost:8080/api/jobs/${id}`, {
+    const response = await fetch(`https://jobtrack-backend-yl5a.onrender.com/api/jobs/${id}`, {
       method: "DELETE",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("token")}`,

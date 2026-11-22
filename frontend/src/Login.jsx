@@ -16,7 +16,7 @@ function Login({ onLoginSuccess, onSwitchToRegister }) {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/auth/login",
+        "https://jobtrack-backend-yl5a.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: {
